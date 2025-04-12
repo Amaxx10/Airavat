@@ -20,8 +20,7 @@ export const get_query = async (req, res) => {
             {
                 headers: { 
                     'Content-Type': 'application/json'
-                },
-                timeout: 10000 // 10 second timeout
+                }
             }
         );
 
@@ -42,3 +41,32 @@ export const get_query = async (req, res) => {
         });
     }
 };
+
+export const get_product_links = async (req, res) => {
+    try {
+        const response = await axios.post(`${flaskUrl}/api/get_product_links`, 
+            { query: 'Black Tshirt' },
+            {
+                headers: { 
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        console.log('Response from Flask server:', response.data);
+        return res.status(200).json(response.data);
+
+    } catch (error) {
+        console.error('Error in get_product_links:', error.message);
+        if (error.response) {
+            console.error('Flask server response:', {
+                data: error.response.data,
+                status: error.response.status
+            });
+        }
+        return res.status(500).json({ 
+            message: 'Error processing',
+            error: error.message 
+        });
+    }
+}

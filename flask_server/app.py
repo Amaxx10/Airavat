@@ -10,13 +10,7 @@ from dotenv import load_dotenv
 # Set up the environment variables for API keys
 app = Flask(__name__)
 # cors = CORS(app)
-CORS(app, resources={
-    r"/api/*": {
-        "origins": ["http://localhost:3000"],
-        "methods": ["POST", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+CORS(app)
 load_dotenv()
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -101,4 +95,4 @@ def get_product_links():
     return product_links
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
