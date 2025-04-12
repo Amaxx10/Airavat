@@ -1,0 +1,1 @@
+export const ngrokURL = import.meta.env.NGROK_URL; // Update this to your backend URL

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Camera, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ngrokURL } from '../config/backendURL';
 
 export function TryOnPage() {
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -104,7 +105,7 @@ const handleUpload = async () => {
 
   try {
     const res = await axios.post(
-      "https://0cf6-103-104-226-58.ngrok-free.app/upload",
+      `${ngrokURL}/upload`,
       formData,
       {
         headers: {

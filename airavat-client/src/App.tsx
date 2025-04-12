@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 import { Navigation } from './components/Navigation';
+import { useState } from 'react';
 
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);

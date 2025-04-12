@@ -9,14 +9,14 @@ from dotenv import load_dotenv
 
 # Set up the environment variables for API keys
 app = Flask(__name__)
-# cors = CORS(app)
-CORS(app)
+cors = CORS(app)
+# CORS(app)
 load_dotenv()
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 gemini_model = genai.GenerativeModel("gemini-1.5-pro-latest")
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def home():
     return 'Welcome to Flask Server!'
 
@@ -93,6 +93,18 @@ def get_product_links():
             product_links.append(link)
 
     return product_links
+
+@app.route('/api/get_cloth_desc', methods=['POST'])
+def get_product_details():
+    data = request.get_json()
+    if not data or 'product_id' not in data:
+        return {'error': 'No product ID provided'}, 400
+
+    product_id = data['product_id']
+
+
+
+    return {'product_id': product_id, 'details': 'Product details would be here.'}
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
