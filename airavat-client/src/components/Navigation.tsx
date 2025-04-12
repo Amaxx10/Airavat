@@ -1,4 +1,4 @@
-import { Home, Search, Heart, User } from "lucide-react"
+import { Home, Search, Heart, User, Bot } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 
 export function Navigation() {
@@ -11,15 +11,6 @@ export function Navigation() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-80 backdrop-blur-md border-t border-ghibli-sky border-opacity-30 px-6 py-3 z-40">
       <div className="flex justify-around items-center max-w-md mx-auto">
-        <Link
-          to="/"
-          className={`flex flex-col items-center ${isActive("/") ? "text-ghibli-forest" : "text-ghibli-night text-opacity-60"}`}
-        >
-          <div className={`p-2 rounded-full ${isActive("/") ? "bg-ghibli-meadow bg-opacity-30" : ""}`}>
-            <Home size={22} />
-          </div>
-          <span className="text-xs mt-1 font-serif">Feed</span>
-        </Link>
 
         <Link
           to="/closet"
@@ -40,6 +31,27 @@ export function Navigation() {
           </div>
           <span className="text-xs mt-1 font-serif">Try On</span>
         </Link>
+        
+        <Link
+          to="/styling"
+          className={`flex flex-col items-center ${isActive("/") ? "text-ghibli-forest" : "text-ghibli-night text-opacity-60"}`}
+        >
+          <div className={`p-2 rounded-full ${isActive("/styling") ? "bg-ghibli-meadow bg-opacity-30" : ""}`}>
+            <Bot size={22} />
+          </div>
+          <span className="text-xs mt-1 font-serif">AI Style</span>
+        </Link>
+
+        <Link
+          to="/feed"
+          className={`flex flex-col items-center ${isActive("/") ? "text-ghibli-forest" : "text-ghibli-night text-opacity-60"}`}
+        >
+          <div className={`p-2 rounded-full ${isActive("/feed") ? "bg-ghibli-meadow bg-opacity-30" : ""}`}>
+            <Home size={22} />
+          </div>
+          <span className="text-xs mt-1 font-serif">Feed</span>
+        </Link>
+
 
         <Link
           to="/profile"
