@@ -1,141 +1,110 @@
-import { useState, useEffect } from 'react';
-import { Camera } from 'lucide-react';
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { Camera, Cloud, Sun } from "lucide-react"
 
 interface Weather {
-  location: string;
-  temp: string;
-  condition: string;
+  location: string
+  temp: string
+  condition: string
 }
 
 interface ClothingItem {
-  id: string;
-  name: string;
-  image: string;
-  category: string;
+  id: string
+  name: string
+  image: string
+  category: string
 }
 
 export function ClosetPage() {
   const [weather, setWeather] = useState<Weather>({
-    location: 'Loading...',
-    temp: '--',
-    condition: 'Loading...',
-  });
+    location: "Valley of the Wind",
+    temp: "72°F",
+    condition: "Sunny with clouds",
+  })
 
   const [clothes, setClothes] = useState<ClothingItem[]>([
-    { id: '1', name: 'Blue T-Shirt', image: 'https://via.placeholder.com/150', category: 'Tops' },
-    { id: '2', name: 'Black Jeans', image: 'https://via.placeholder.com/150', category: 'Bottoms' },
-    { id: '3', name: 'Red Dress', image: 'https://via.placeholder.com/150', category: 'Dresses' },
-  ]);
+    { id: "1", name: "Meadow Blouse", image: "/placeholder.svg?height=150&width=150", category: "Tops" },
+    { id: "2", name: "Forest Trousers", image: "/placeholder.svg?height=150&width=150", category: "Bottoms" },
+    { id: "3", name: "Sky Dress", image: "/placeholder.svg?height=150&width=150", category: "Dresses" },
+  ])
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  // Fetch weather data
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        // First, get the user's location from IP
-        const ipResponse = await fetch('https://api.ipapi.com/api/check?access_key=YOUR_IPAPI_KEY');
-        const ipData = await ipResponse.json();
-        
-        // Then, get the weather data
-        const weatherResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${ipData.latitude}&lon=${ipData.longitude}&units=imperial&appid=YOUR_OPENWEATHER_API_KEY`
-        );
-        const weatherData = await weatherResponse.json();
-        
-        setWeather({
-          location: ipData.city,
-          temp: `${Math.round(weatherData.main.temp)}°F`,
-          condition: weatherData.weather[0].main
-        });
-      } catch (error) {
-        console.error('Error fetching weather:', error);
-        setWeather({
-          location: "Location unavailable",
-          temp: "--°F",
-          condition: "Weather data unavailable"
-        });
-      }
-    };
-
-    fetchWeather();
-  }, []);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setClothes(prev => [
+      const imageUrl = URL.createObjectURL(file)
+      setClothes((prev) => [
         ...prev,
         {
           id: Date.now().toString(),
-          name: 'New Item',
+          name: "New Treasure",
           image: imageUrl,
-          category: 'Uncategorized',
+          category: "Uncategorized",
         },
-      ]);
+      ])
     }
-  };
+  }
 
   const handleCategoryClick = (category: string) => {
-    setSelectedCategory(category);
-  };
+    setSelectedCategory(category)
+  }
 
-  const filteredClothes = selectedCategory
-    ? clothes.filter(item => item.category === selectedCategory)
-    : [];
+  const filteredClothes = selectedCategory ? clothes.filter((item) => item.category === selectedCategory) : []
 
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-fadeIn space-y-6 pb-6">
       {/* Weather */}
-      <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+      <div className="ghibli-card p-4 mb-2">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">{weather.location}</h3>
-            <p className="text-gray-500">{weather.condition}</p>
+            <h3 className="font-serif text-lg text-ghibli-night">{weather.location}</h3>
+            <p className="text-ghibli-night opacity-70 font-serif text-sm">{weather.condition}</p>
           </div>
-          <div className="text-2xl font-bold text-indigo-700">{weather.temp}</div>
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-ghibli-sky bg-opacity-30 flex items-center justify-center">
+              <Sun size={24} className="text-ghibli-forest" />
+            </div>
+            <span className="text-xl font-serif text-ghibli-forest">{weather.temp}</span>
+          </div>
         </div>
       </div>
 
       {/* Action Bar */}
-      <div className="flex justify-between mb-6">
-        <label className="bg-indigo-500 text-white rounded-lg px-4 py-2 flex items-center gap-2 shadow-md cursor-pointer">
+      <div className="flex justify-between mb-2">
+        <label className="bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white rounded-xl px-4 py-2 flex items-center gap-2 shadow-ghibli hover:shadow-ghibli-lg transition-all hover:-translate-y-1 cursor-pointer">
           <Camera size={18} />
-          <span>Add Item</span>
-          <input
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
+          <span className="font-serif">Add Item</span>
+          <input type="file" accept="image/*" capture="environment" onChange={handleImageUpload} className="hidden" />
         </label>
-        <button className="bg-white text-indigo-600 border border-indigo-200 rounded-lg px-4 py-2 shadow-sm">
+        <button className="ghibli-card px-4 py-2 text-ghibli-forest font-serif hover:shadow-ghibli transition-shadow">
           Organize
         </button>
       </div>
 
       {/* Closet */}
-      <h2 className="text-xl font-bold mb-4 text-gray-800">My Closet</h2>
+      <h2 className="text-xl font-serif font-medium text-ghibli-night mt-6 mb-4">My Magical Wardrobe</h2>
 
       {selectedCategory ? (
         <>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">{selectedCategory}</h3>
+            <h3 className="text-lg font-serif text-ghibli-night">{selectedCategory}</h3>
             <button
               onClick={() => setSelectedCategory(null)}
-              className="text-indigo-600 hover:text-indigo-800"
+              className="text-ghibli-forest hover:text-ghibli-sky font-serif transition-colors"
             >
               Back to Categories
             </button>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {filteredClothes.map(item => (
-              <div key={item.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                <img src={item.image} alt={item.name} className="w-full h-32 object-cover" />
+            {filteredClothes.map((item) => (
+              <div key={item.id} className="ghibli-card overflow-hidden">
+                <img src={item.image || "/placeholder.svg"} alt={item.name} className="w-full h-40 object-cover" />
                 <div className="p-3">
-                  <h3 className="font-medium text-gray-800">{item.name}</h3>
+                  <h3 className="font-serif text-ghibli-night">{item.name}</h3>
                 </div>
               </div>
             ))}
@@ -143,17 +112,19 @@ export function ClosetPage() {
         </>
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          {['Tops', 'Bottoms', 'Dresses', 'Shoes', 'Accessories', 'Outerwear'].map(category => (
+          {["Tops", "Bottoms", "Dresses", "Shoes", "Accessories", "Outerwear"].map((category) => (
             <div
               key={category}
               onClick={() => handleCategoryClick(category)}
-              className="bg-white rounded-xl shadow-sm overflow-hidden transition-transform hover:shadow-md hover:-translate-y-1 cursor-pointer"
+              className="ghibli-card overflow-hidden transition-all hover:shadow-ghibli-lg hover:-translate-y-1 cursor-pointer"
             >
-              <div className="h-32 bg-gray-200"></div>
+              <div className="h-32 bg-gradient-to-br from-ghibli-cloud to-ghibli-sky opacity-30 flex items-center justify-center">
+                <Cloud size={32} className="text-white" />
+              </div>
               <div className="p-3">
-                <h3 className="font-medium text-gray-800">{category}</h3>
-                <p className="text-xs text-gray-500">
-                  {clothes.filter(item => item.category === category).length} items
+                <h3 className="font-serif text-ghibli-night">{category}</h3>
+                <p className="text-xs text-ghibli-night opacity-60 font-serif">
+                  {clothes.filter((item) => item.category === category).length} items
                 </p>
               </div>
             </div>
@@ -161,5 +132,6 @@ export function ClosetPage() {
         </div>
       )}
     </div>
-  );
+  )
 }
+

@@ -1,40 +1,87 @@
-import { Film } from 'lucide-react';
+import { Film, Heart, MessageCircle, Share2 } from "lucide-react"
 
 export function FeedPage() {
-  return (
-    <div className="animate-fadeIn -mx-4 h-full">
-      <div className="relative h-full overflow-hidden">
-        <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-          <div className="text-center p-4">
-            <Film size={40} className="mx-auto text-gray-500 mb-2" />
-            <h3 className="text-xl font-semibold text-gray-700">Style Feed</h3>
-            <p className="text-gray-500 mt-2">Swipe up to discover trending styles and follow your favorite fashion influencers.</p>
-          </div>
-        </div>
+  const feedItems = [
+    {
+      id: 1,
+      username: "miyazaki_style",
+      avatar: "/placeholder.svg?height=40&width=40",
+      image: "/placeholder.svg?height=400&width=300",
+      caption: "Inspired by the colors of the valley. Nature's palette is truly the most beautiful.",
+      likes: 342,
+      comments: 28,
+    },
+    {
+      id: 2,
+      username: "totoro_fashion",
+      avatar: "/placeholder.svg?height=40&width=40",
+      image: "/placeholder.svg?height=400&width=300",
+      caption: "Forest spirits guided me to this outfit combination. Embracing earthy tones today.",
+      likes: 517,
+      comments: 42,
+    },
+  ]
 
-        <div className="absolute bottom-8 right-4 z-10">
-          <div className="flex flex-col items-center gap-4">
-            <button className="bg-white rounded-full p-2 shadow-md">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-            </button>
-            <button className="bg-white rounded-full p-2 shadow-md">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-              </svg>
-            </button>
-            <button className="bg-white rounded-full p-2 shadow-md">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="17 1 21 5 17 9" />
-                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                <polyline points="7 23 3 19 7 15" />
-                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-              </svg>
-            </button>
+  return (
+    <div className="animate-fadeIn space-y-6 pb-6">
+      {feedItems.length > 0 ? (
+        feedItems.map((item) => (
+          <div key={item.id} className="ghibli-card overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center p-4">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-ghibli-sky">
+                <img
+                  src={item.avatar || "/placeholder.svg"}
+                  alt={item.username}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span className="ml-3 font-serif text-ghibli-night">{item.username}</span>
+            </div>
+
+            {/* Image */}
+            <div className="relative">
+              <img
+                src={item.image || "/placeholder.svg"}
+                alt="Fashion post"
+                className="w-full aspect-[4/5] object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-30"></div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center p-4">
+              <button className="mr-4 transform transition hover:scale-110">
+                <Heart size={24} className="text-ghibli-night" />
+              </button>
+              <button className="mr-4 transform transition hover:scale-110">
+                <MessageCircle size={24} className="text-ghibli-night" />
+              </button>
+              <button className="transform transition hover:scale-110">
+                <Share2 size={24} className="text-ghibli-night" />
+              </button>
+              <span className="ml-auto font-serif text-sm text-ghibli-night">{item.likes} likes</span>
+            </div>
+
+            {/* Caption */}
+            <div className="px-4 pb-4">
+              <p className="font-serif text-ghibli-night">
+                <span className="font-medium">{item.username}</span> {item.caption}
+              </p>
+              <p className="mt-1 text-sm text-ghibli-night opacity-60 font-serif">View all {item.comments} comments</p>
+            </div>
           </div>
+        ))
+      ) : (
+        <div className="ghibli-card p-8 text-center">
+          <Film size={40} className="mx-auto text-ghibli-forest mb-4" />
+          <h3 className="text-xl font-serif font-medium text-ghibli-night mb-2">Style Feed</h3>
+          <p className="text-ghibli-night opacity-70 font-serif">
+            Discover trending styles and follow your favorite fashion influencers.
+          </p>
         </div>
-      </div>
+      )}
     </div>
-  );
-} 
+  )
+}
+

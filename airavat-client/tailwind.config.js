@@ -2,10 +2,11 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    "*.{js,ts,jsx,tsx,mdx}",
   ],
   prefix: "",
   theme: {
@@ -20,8 +21,7 @@ module.exports = {
       colors: {
         nauf: "#06b6d4",
         border: "hsl(var(--border))",
-        // input: "hsl(var(--input))",
-        input: "240 5.9% 90%",
+        input: "240 5.9% 90%", // your original override
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -53,13 +53,45 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        ghibli: {
+          sky: "#a8d8ea",
+          cloud: "#f5f7dc",
+          meadow: "#c5e0b4",
+          sunset: "#ffcdb2",
+          blossom: "#ffc8dd",
+          forest: "#6d9886",
+          earth: "#d4a373",
+          night: "#2b2d42",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        serif: ["Playfair Display", "serif"],
+        sans: ["Lato", "sans-serif"],
+      },
+      backgroundImage: {
+        "ghibli-gradient":
+          "linear-gradient(to right bottom, #a8d8ea, #c5e0b4, #f5f7dc)",
+        "ghibli-sunset":
+          "linear-gradient(to right bottom, #ffcdb2, #ffc8dd, #f5f7dc)",
+      },
+      boxShadow: {
+        ghibli: "0 4px 20px -2px rgba(112, 144, 176, 0.25)",
+        "ghibli-lg": "0 10px 30px -5px rgba(112, 144, 176, 0.3)",
+      },
       keyframes: {
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        breathe: {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.03)" },
+        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -70,10 +102,12 @@ module.exports = {
         },
       },
       animation: {
+        float: "float 6s ease-in-out infinite",
+        breathe: "breathe 8s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};

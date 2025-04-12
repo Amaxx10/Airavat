@@ -29,7 +29,7 @@ const router = createBrowserRouter([
         element: <AIStylingPage />,
       },
       {
-        path: '/tryon',
+        path: '/try-on',
         element: <TryOnPage />,
       },
       {
