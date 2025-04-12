@@ -7,12 +7,11 @@ import os
 genai.configure(api_key="AIzaSyC1f61j-VZUjkqNJZdhumpoON2ZZZjTcjY")
 
 # === CONFIG ===
-image_folder = "data/lowers"  # Folder containing the images
+image_path = "data/lowers/download.jpg"  # Folder containing the images
 item_type = "lower"  # or "lower"
 output_json = "clothing_items.json"
 
 # Load all images in the folder
-image_paths = [os.path.join(image_folder, f) for f in os.listdir(image_folder) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
 
 # Define Gemini prompt
 prompt = """
@@ -27,25 +26,25 @@ last_id = 4
 
 
 # Process each image
-for image_path in image_paths:
-    # Load the image
-    img = PIL.Image.open(image_path)
 
-    # Call Gemini API
-    model = genai.GenerativeModel('gemini-2.0-flash')
-    response = model.generate_content([prompt, img])
-    description = response.text.strip()
+# Load the image
+img = PIL.Image.open(image_path)
 
-    # Create the structured entry
-    clothing_entry = {
-        "id": len(clothing_items) + last_id + 1,  # Unique ID based on the current number of entries
-        "path": image_path,
-        "type": item_type,
-        "description": description
-    }
+# Call Gemini API
+model = genai.GenerativeModel('gemini-2.0-flash')
+response = model.generate_content([prompt, img])
+description = response.text.strip()
 
-    # Append new item to the list
-    clothing_items.append(clothing_entry)
+# Create the structured entry
+clothing_entry = {
+    "id": len(clothing_items) + last_id + 1,  # Unique ID based on the current number of entries
+    "path": image_path,
+    "type": item_type,
+    "description": description
+}
+
+# Append new item to the list
+clothing_items.append(clothing_entry)
 
 # === Save to JSON ===
 
