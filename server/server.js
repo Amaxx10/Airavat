@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import connectDB from './config/connectdb.js';
 import dotenv from 'dotenv';
+import query_routes from './routes/query_routes.js';
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -17,6 +18,7 @@ app.use('/', (req, res) => {
     res.send('<h1>Hello World!</h1>');
 });
 
+app.use('/query',query_routes);
 app.listen(port, async () => {
     try {
         await connectDB();
