@@ -12,7 +12,7 @@ export const get_query = async (req, res) => {
             return res.status(400).json({ message: 'No image data provided' });
         }
 
-        const flaskUrl = process.env.FLASK_URL || 'http://localhost:5000';
+        const flaskUrl = process.env.FLASK_URL;
         console.log(`Sending request to Flask server at ${flaskUrl}`);
 
         const response = await axios.post(`${flaskUrl}/api/get_query`, 

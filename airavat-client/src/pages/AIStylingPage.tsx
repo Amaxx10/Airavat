@@ -1,6 +1,30 @@
 import { Calendar, Sparkles } from "lucide-react"
+import axios from "axios";
+import { backendURL } from "../config/backendURL";
+import { useState } from "react";
 
 export function AIStylingPage() {
+  const [outfitData, setOutfitData] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const handleSummonOutfit = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${backendURL}/ai/ai_styling`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = response.data;
+      setOutfitData(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+    
+  };
+
   return (
     <div className="animate-fadeIn space-y-6 pb-6">
       <div className="text-center mb-8">
@@ -69,7 +93,7 @@ export function AIStylingPage() {
             </div>
           </div>
 
-          <button className="w-full bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white rounded-xl py-3 font-serif shadow-ghibli hover:shadow-ghibli-lg transition-shadow transform hover:-translate-y-1">
+          <button onClick={handleSummonOutfit} className="w-full bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white rounded-xl py-3 font-serif shadow-ghibli hover:shadow-ghibli-lg transition-shadow transform hover:-translate-y-1">
             <div className="flex items-center justify-center gap-2">
               <Sparkles size={18} />
               <span>Summon Your Outfit</span>
@@ -77,6 +101,46 @@ export function AIStylingPage() {
           </button>
         </div>
       </div>
+
+      {isLoading && (
+        <div className="text-center">
+          <p className="font-serif">Summoning your magical outfit...</p>
+        </div>
+      )}
+
+      {outfitData && (
+        <div className="ghibli-card p-6 space-y-4">
+          <h3 className="font-serif text-lg text-ghibli-night">Your Magical Outfit</h3>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-serif">Upper Garment</h4>
+              <img 
+                src={outfitData.suggestion.upper_garment.image} 
+                alt="Upper garment"
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <p className="text-sm">{outfitData.suggestion.upper_garment.description}</p>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="font-serif">Lower Garment</h4>
+              <img 
+                src={outfitData.suggestion.lower_garment.image} 
+                alt="Lower garment"
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <p className="text-sm">{outfitData.suggestion.lower_garment.description}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="text-red-500 text-center">
+          <p>{error}</p>
+        </div>
+      )}
     </div>
   )
 }

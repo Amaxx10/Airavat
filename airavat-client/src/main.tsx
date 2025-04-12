@@ -1,15 +1,31 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate, useNavigate } from 'react-router-dom'
 import { ClosetPage } from './pages/ClosetPage'
 import { AIStylingPage } from './pages/AIStylingPage'
 import { TryOnPage } from './pages/TryOnPage'
 import { FeedPage } from './pages/FeedPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { PreferencesPage } from './pages/PreferencesPage'
 import App from './App'
+import { useEffect } from 'react'
 
 const tmp = 'h-screen bg-black text-white text-4xl text-center grid place-items-center'
+
+function PreferencesCheck() {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const hasPreferences = localStorage.getItem('stylePreferences');
+    if (!hasPreferences) {
+      navigate('/preferences');
+    }
+  }, [navigate]);
+
+  return <ClosetPage />;
+}
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -18,7 +34,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <ClosetPage />,
+        element: <PreferencesCheck />,
       },
       {
         path: '/closet',
@@ -39,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: '/profile',
         element: <ProfilePage />,
+      },
+      {
+        path: '/preferences',
+        element: <PreferencesPage />,
       }
     ]
   }
