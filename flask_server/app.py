@@ -1,4 +1,4 @@
-from flask import Flask,request, jsonify
+from flask import Flask, request, jsonify
 import google.generativeai as genai
 from serpapi import GoogleSearch
 import os
@@ -12,14 +12,15 @@ from pymongo.errors import ConnectionFailure
 # Set up the environment variables for API keys
 app = Flask(__name__)
 cors = CORS(app)
-# CORS(app)
 load_dotenv()
 
 # MongoDB Configuration
 try:
     mongo_client = MongoClient(os.getenv('MONGODB_URL'))
     db = mongo_client['test']
-    closet_collection = db['closet']  # Add collection for closet
+    closet_collection = db['closets']  # Add collection for closet
+    feed_images_collection = db['feedimages']
+    print(closet_collection.count_documents({}))
     print("MongoDB connected successfully!")
 except ConnectionFailure as e:
     print(f"MongoDB connection error: {e}")
@@ -36,11 +37,16 @@ def get_query():
     try:
         print("Received request data:", request.get_json())
         data = request.get_json()
-        if not data or 'image' not in data:
-            return {'error': 'No image data provided'}, 400
+        if not data or 'image_id' not in data:
+            return {'error': 'No image ID provided'}, 400
             
-        # Get base64 image data from JSON
-        image_data = data['image']
+        # Get image from MongoDB using the ID
+        image_doc = db['feedimages'].find_one({'_id': data['image_id']})
+        if not image_doc:
+            return {'error': 'Image not found in database'}, 404
+            
+        # Get base64 image data
+        image_data = image_doc['image']
         
         # Decode base64 to bytes
         import base64
@@ -49,7 +55,7 @@ def get_query():
         # Process image data for Gemini
         image_parts = [
             {
-                "mime_type": "image/png",  # Adjust mime type if needed
+                "mime_type": "image/png",
                 "data": image_bytes
             }
         ]
@@ -66,20 +72,19 @@ def get_query():
         )
 
         response = gemini_model.generate_content([prompt, image_parts])
-        return {'query': response.text.strip().replace("\n", "")}
+        product_links = get_product_links(response.text.strip().replace("\n", ""))
+        return {'query': response.text.strip().replace("\n", ""), 'product_links': product_links}
 
     except Exception as e:
         print(f"[ERROR] Error generating search query: {e}")
         return {'error': str(e)}, 500
-
-@app.route('/api/get_product_links', methods=['POST'])
-def get_product_links():
+    
+def get_product_links(query):
     serp_api_key = os.getenv("SERPAPI_KEY")
     if not serp_api_key:
         print("Error: SerpAPI key not set in environment variables.")
         return []
-
-    query = json.loads(request.data).get("query")
+    
     if not query:
         print("Error: No query provided.")
         return []
@@ -95,7 +100,7 @@ def get_product_links():
     results = search.get_dict()
     shopping_results = results.get("shopping_results", [])
     
-    print("[DEBUG] Full API Response:", results)  # Optional debug output
+    print("[DEBUG] Full API Response:", results)
 
     product_links = []
     for i, item in enumerate(shopping_results[:5]):
@@ -105,42 +110,31 @@ def get_product_links():
 
     return product_links
 
-def get_clothing_suggestion(upper_items, lower_items, preferences=None, weather="Sunny, 31 degrees", occasion="casual"):
-    # Format preferences into a readable string
-    pref_string = ""
-    if preferences:
-        pref_string = f"""
-        Gender: {preferences.get('gender', 'Not specified')}
-        Body Shape: {preferences.get('bodyShape', 'Not specified')}
-        Skin Tone: {preferences.get('skinTone', 'Not specified')}
-        Style Preferences: {', '.join(preferences.get('stylePreferences', []))}
-        Color Preferences: {', '.join(preferences.get('colorPreferences', []))}
-        """
+def extract_numbers(text):
+    """Extract the first two numbers from text."""
+    import re
+    numbers = re.findall(r'\d+', text)
+    return [int(num) for num in numbers[:2]] if len(numbers) >= 2 else None
 
-    upper_description = "\n".join([f"{item['dress_id']}. {item['description']}" for item in upper_items])
-    lower_description = "\n".join([f"{item['dress_id']}. {item['description']}" for item in lower_items])
-    
+def get_clothing_suggestion(upper_items, lower_items, preferences=None, weather="Sunny, 31 degrees", occasion="casual"):
     prompt = f"""
-    Act as an experienced fashion designer with great taste in selecting clothes and very good fashion sense.
-    The user has the following characteristics and preferences:
-    {pref_string or 'No specific preferences provided'}
+    You are a fashion expert. Select the best clothing combination using only the available items.
     
-    The weather today is:
-    {weather}
+    Requirements:
+    1. Respond ONLY with two numbers: first for upper garment, second for lower garment
+    2. Format example: "1 2" or "1,2" (just the numbers)
     
-    The occasion for the user is:
-    {occasion}
+    User preferences:
+    {preferences if preferences else 'No specific preferences'}
     
-    The following are the descriptions of the upper body garments:
-    {upper_description}
+    Weather: {weather}
+    Occasion: {occasion}
     
-    The following are the descriptions of the lower body garments:
-    {lower_description}
+    Upper garments:
+    {"\n".join([f"{item['dress_id']}. {item['description']}" for item in upper_items])}
     
-    Using the user's characteristics, preferences, weather conditions, and occasion, select one upper body garment and one lower body garment most suitable.
-    Consider skin tone compatibility with colors, body shape with clothing fit, and style preferences.
-    
-    Just give me the number of the upper body garment and lower body garment that you select.
+    Lower garments:
+    {"\n".join([f"{item['dress_id']}. {item['description']}" for item in lower_items])}
     """
     
     response = gemini_model.generate_content(prompt)
@@ -160,11 +154,10 @@ def get_ai_styling():
         # Fetch clothing items from MongoDB
         upper_items = list(closet_collection.find({"dress_type": "upper garment"}))
         lower_items = list(closet_collection.find({"dress_type": "lower garment"}))
-
         if not upper_items or not lower_items:
             return jsonify({'error': 'No clothing items found in closet'}), 404
 
-        # Get AI suggestion with updated preferences
+        # Get AI suggestion
         suggestion = get_clothing_suggestion(
             upper_items, 
             lower_items,
@@ -173,18 +166,20 @@ def get_ai_styling():
             occasion
         )
 
-        # Parse the suggestion to get dress IDs
-        try:
-            upper_id, lower_id = map(int, suggestion.split())
-            return jsonify({
-                'upper_garment_id': upper_id,
-                'lower_garment_id': lower_id,
-                'weather': weather,
-                'occasion': occasion,
-                'preferences': preferences
-            })
-        except ValueError as e:
-            return jsonify({'error': f'Invalid suggestion format: {str(e)}'}), 500
+        # Extract numbers from the suggestion
+        numbers = extract_numbers(suggestion)
+        if not numbers:
+            return jsonify({'error': 'Could not extract valid clothing IDs from AI response'}), 500
+
+        upper_id, lower_id = numbers
+        
+        return jsonify({
+            'upper_garment_id': upper_id,
+            'lower_garment_id': lower_id,
+            'weather': weather,
+            'occasion': occasion,
+            'preferences': preferences
+        })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
