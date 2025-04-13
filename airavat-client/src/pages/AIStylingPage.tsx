@@ -83,7 +83,7 @@ export function AIStylingPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-serif text-ghibli-night opacity-80 mb-2">Color Palette</label>
+            {/* <label className="block text-sm font-serif text-ghibli-night opacity-80 mb-2">Color Palette</label>
             <div className="flex gap-2 mb-4">
               {["#a8d8ea", "#c5e0b4", "#ffcdb2", "#ffc8dd", "#d4a373"].map((color) => (
                 <div
@@ -92,7 +92,7 @@ export function AIStylingPage() {
                   style={{ backgroundColor: color }}
                 ></div>
               ))}
-            </div>
+            </div> */}
           </div>
 
           <button onClick={handleSummonOutfit} className="w-full bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white rounded-xl py-3 font-serif shadow-ghibli hover:shadow-ghibli-lg transition-shadow transform hover:-translate-y-1">

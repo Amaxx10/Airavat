@@ -2,8 +2,10 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { Camera, Cloud, Sun } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Camera, Sun } from "lucide-react"
+import axios from "axios"
+import { ngrokURL } from "../config/backendURL"
 
 interface Weather {
   location: string
@@ -13,47 +15,74 @@ interface Weather {
 
 interface ClothingItem {
   id: string
-  name: string
   image: string
-  category: string
+  description?: string
 }
 
 export function ClosetPage() {
-  const [weather, setWeather] = useState<Weather>({
+  const [weather] = useState<Weather>({
     location: "Valley of the Wind",
     temp: "72°F",
     condition: "Sunny with clouds",
   })
 
-  const [clothes, setClothes] = useState<ClothingItem[]>([
-    { id: "1", name: "Meadow Blouse", image: "/placeholder.svg?height=150&width=150", category: "Tops" },
-    { id: "2", name: "Forest Trousers", image: "/placeholder.svg?height=150&width=150", category: "Bottoms" },
-    { id: "3", name: "Sky Dress", image: "/placeholder.svg?height=150&width=150", category: "Dresses" },
-  ])
+  const [clothes, setClothes] = useState<ClothingItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  // Fetch closet items from backend
+  useEffect(() => {
+    const fetchClosetItems = async () => {
+      try {
+        setIsLoading(true)
+        const response = await axios.get(`${ngrokURL}/closet/get_images`)
+        console.log('Closet response:', response)
+        
+        // Transform the response data into our ClothingItem format
+        const transformedItems = response.data.images.map((image: string, index: number) => ({
+          id: `item-${index}`,
+          image: image,
+          description: `Clothing item ${index + 1}`
+        }))
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setClothes(transformedItems)
+        setError(null)
+      } catch (err) {
+        console.error("Error fetching closet items:", err)
+        setError("Failed to load closet items. Please try again later.")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchClosetItems()
+  }, [])
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const imageUrl = URL.createObjectURL(file)
-      setClothes((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          name: "New Treasure",
-          image: imageUrl,
-          category: "Uncategorized",
-        },
-      ])
+      try {
+        const formData = new FormData()
+        formData.append("image", file)
+        formData.append("description", "New clothing item")
+        formData.append("dress_type", "upper garment")
+
+        const response = await axios.get(`${ngrokURL}/closet/get_images`)
+
+        // Add the new item to the state
+        const newItem = {
+          id: response.data.dress.dress_id.toString(),
+          image: `data:image/jpeg;base64,${response.data.dress.image}`,
+          description: response.data.dress.description
+        }
+
+        setClothes(prev => [...prev, newItem])
+      } catch (err) {
+        console.error("Error uploading image:", err)
+        setError("Failed to upload image. Please try again.")
+      }
     }
   }
-
-  const handleCategoryClick = (category: string) => {
-    setSelectedCategory(category)
-  }
-
-  const filteredClothes = selectedCategory ? clothes.filter((item) => item.category === selectedCategory) : []
 
   return (
     <div className="animate-fadeIn space-y-6 pb-6">
@@ -80,53 +109,37 @@ export function ClosetPage() {
           <span className="font-serif">Add Item</span>
           <input type="file" accept="image/*" capture="environment" onChange={handleImageUpload} className="hidden" />
         </label>
-        <button className="ghibli-card px-4 py-2 text-ghibli-forest font-serif hover:shadow-ghibli transition-shadow">
-          Organize
-        </button>
       </div>
 
-      {/* Closet */}
+      {/* Closet Grid */}
       <h2 className="text-xl font-serif font-medium text-ghibli-night mt-6 mb-4">My Magical Wardrobe</h2>
 
-      {selectedCategory ? (
-        <>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-serif text-ghibli-night">{selectedCategory}</h3>
-            <button
-              onClick={() => setSelectedCategory(null)}
-              className="text-ghibli-forest hover:text-ghibli-sky font-serif transition-colors"
-            >
-              Back to Categories
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {filteredClothes.map((item) => (
-              <div key={item.id} className="ghibli-card overflow-hidden">
-                <img src={item.image || "/placeholder.svg"} alt={item.name} className="w-full h-40 object-cover" />
-                <div className="p-3">
-                  <h3 className="font-serif text-ghibli-night">{item.name}</h3>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
+      {error && (
+        <div className="text-red-500 text-center p-4 bg-red-50 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <div className="animate-spin w-8 h-8 border-4 border-ghibli-forest border-t-transparent rounded-full"></div>
+        </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
-          {["Tops", "Bottoms", "Dresses", "Shoes", "Accessories", "Outerwear"].map((category) => (
-            <div
-              key={category}
-              onClick={() => handleCategoryClick(category)}
-              className="ghibli-card overflow-hidden transition-all hover:shadow-ghibli-lg hover:-translate-y-1 cursor-pointer"
-            >
-              <div className="h-32 bg-gradient-to-br from-ghibli-cloud to-ghibli-sky opacity-30 flex items-center justify-center">
-                <Cloud size={32} className="text-white" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {clothes.map((item) => (
+            <div key={item.id} className="ghibli-card overflow-hidden hover:shadow-ghibli-lg transition-all">
+              <div className="aspect-square">
+                <img 
+                  src={item.image} 
+                  alt={item.description || "Clothing item"} 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <div className="p-3">
-                <h3 className="font-serif text-ghibli-night">{category}</h3>
-                <p className="text-xs text-ghibli-night opacity-60 font-serif">
-                  {clothes.filter((item) => item.category === category).length} items
-                </p>
-              </div>
+              {item.description && (
+                <div className="p-3">
+                  <p className="text-sm text-ghibli-night opacity-70 font-serif">{item.description}</p>
+                </div>
+              )}
             </div>
           ))}
         </div>

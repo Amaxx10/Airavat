@@ -39,7 +39,7 @@ export function Navigation() {
           <div className={`p-2 rounded-full ${isActive("/styling") ? "bg-ghibli-meadow bg-opacity-30" : ""}`}>
             <Bot size={22} />
           </div>
-          <span className="text-xs mt-1 font-serif">AI Style</span>
+          <span className="text-xs mt-1 font-serif">Spirit Style</span>
         </Link>
 
         <Link
