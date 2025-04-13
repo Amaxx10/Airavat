@@ -247,7 +247,7 @@ export function TryOnPage() {
         </button>
       )}
 
-      <div className="w-full mt-4">
+      {/* <div className="w-full mt-4">
         <h3 className="font-serif text-ghibli-night mb-3">Recent Enchantments</h3>
         <div className="grid grid-cols-3 gap-3">
           {[1, 2, 3].map((i) => (
@@ -256,7 +256,7 @@ export function TryOnPage() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -60,7 +60,7 @@ export function AIStylingPage() {
         <h3 className="font-serif text-lg text-ghibli-night mb-4 relative z-10">Create a Magical Style</h3>
 
         <div className="space-y-4 relative z-10">
-          <div>
+          {/* <div>
             <label className="block text-sm font-serif text-ghibli-night opacity-80 mb-2">Occasion</label>
             <select className="w-full ghibli-input font-serif">
               <option>Select occasion</option>
@@ -80,7 +80,35 @@ export function AIStylingPage() {
               <option>Sky Wanderer</option>
               <option>Earth Guardian</option>
             </select>
-          </div>
+          </div> */}
+
+
+  {/* Mood Today */}
+  <div>
+    <label className="block text-sm font-serif text-ghibli-night opacity-80 mb-2">Mood Today</label>
+    <select className="w-full ghibli-input font-serif">
+      <option>Select your vibe</option>
+      <option>Cozy</option>
+      <option>Bold</option>
+      <option>Playful</option>
+      <option>Dreamy</option>
+      <option>Minimal</option>
+      <option>Elegant</option>
+    </select>
+  </div>
+
+  {/* Color Aura */}
+  <div>
+    <label className="block text-sm font-serif text-ghibli-night opacity-80 mb-2">Color Aura</label>
+    <select className="w-full ghibli-input font-serif">
+      <option>Pick a color you're drawn to</option>
+      <option>Soft Pastels</option>
+      <option>Earthy Neutrals</option>
+      <option>Deep Tones</option>
+      <option>Bright Pops</option>
+      <option>Monochrome</option>
+    </select>
+  </div>
 
           <div>
             {/* <label className="block text-sm font-serif text-ghibli-night opacity-80 mb-2">Color Palette</label>

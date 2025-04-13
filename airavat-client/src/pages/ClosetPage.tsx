@@ -21,10 +21,10 @@ interface ClothingItem {
 
 export function ClosetPage() {
   const [weather] = useState<Weather>({
-    location: "Valley of the Wind",
-    temp: "72°F",
-    condition: "Sunny with clouds",
-  })
+    location: "Mumbai, Maharashtra",
+    temp: "28°C",
+    condition: "Partly Cloudy",
+  });
 
   const [clothes, setClothes] = useState<ClothingItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -148,17 +148,17 @@ export function ClosetPage() {
       ) : (
         <div className="grid grid-cols-2 gap-4">
           {clothes.map((item) => (
-            <div key={item.id} className="ghibli-card overflow-hidden hover:shadow-ghibli-lg transition-all">
-              <div className="aspect-square">
+            <div key={item.id} className="ghibli-card cursor-pointer overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-ghibli-lg group">
+              <div className="relative pt-[100%]">
                 <img 
                   src={item.image} 
                   alt={item.description || "Clothing item"} 
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-contain bg-white p-2"
                 />
               </div>
               {item.description && (
-                <div className="p-3">
-                  <p className="text-sm text-ghibli-night opacity-70 font-serif">{item.description}</p>
+                <div className="p-3 bg-white">
+                  <p className="text-sm text-center text-black opacity-80 font-serif">{item.description}</p>
                 </div>
               )}
             </div>

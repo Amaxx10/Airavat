@@ -1,6 +1,7 @@
-import { Film, Heart, MessageCircle, Share2, X } from "lucide-react"
+import { Film, ShoppingCart, Heart, MessageCircle, X, MessageCircleartX } from "lucide-react"
 import { useState } from "react"
 import axios from "axios"
+import { LinkPreview } from '@dhaiwat10/react-link-preview';
 import { ngrokURL } from "../config/backendURL"
 
 interface ProductLink {
@@ -133,13 +134,13 @@ export function FeedPage() {
                 className="mr-4 transform transition hover:scale-110"
                 onClick={() => handleLike(item.image)}
               >
-                <Heart size={24} className="text-ghibli-night" />
+                <ShoppingCart size={24} className="text-ghibli-night" />
               </button>
               <button className="mr-4 transform transition hover:scale-110">
-                <MessageCircle size={24} className="text-ghibli-night" />
+                <Heart size={24} className="text-ghibli-night" />
               </button>
               <button className="transform transition hover:scale-110">
-                <Share2 size={24} className="text-ghibli-night" />
+                <MessageCircle size={24} className="text-ghibli-night" />
               </button>
               <span className="ml-auto font-serif text-sm text-ghibli-night">{item.likes} likes</span>
             </div>
