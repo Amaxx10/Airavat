@@ -9,7 +9,7 @@ export function Navigation() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-80 backdrop-blur-md border-t border-ghibli-sky border-opacity-30 px-6 py-3 z-40">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-80 backdrop-blur-md border-t border-ghibli-sky border-opacity-30 px-6 py-1 z-40">
       <div className="flex justify-around items-center max-w-md mx-auto">
 
         <Link

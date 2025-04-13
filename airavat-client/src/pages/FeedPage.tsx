@@ -1,4 +1,4 @@
-import { Film, ShoppingCart, Heart, MessageCircle, X, MessageCircleartX } from "lucide-react"
+import { Film, ShoppingCart, Heart, MessageCircle, X } from "lucide-react"
 import { useState } from "react"
 import axios from "axios"
 import { LinkPreview } from '@dhaiwat10/react-link-preview';
@@ -102,55 +102,63 @@ export function FeedPage() {
   }
 
   return (
-    <div className="animate-fadeIn space-y-6 pb-6">
+    <div className="h-screen snap-y snap-mandatory overflow-y-scroll">
       {feedItems.length > 0 ? (
         feedItems.map((item) => (
-          <div key={item.id} className="ghibli-card overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center p-4">
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-ghibli-sky">
-                <img
-                  src={item.avatar || "/placeholder.svg"}
-                  alt={item.username}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="ml-3 font-serif text-ghibli-night">{item.username}</span>
-            </div>
-
-            {/* Image */}
-            <div className="relative">
+          <div 
+            key={item.id} 
+            className="h-3/4 w-full snap-start snap-always relative flex flex-col"
+          >
+            {/* Main content container */}
+            <div className="relative flex-1 w-full">
+              {/* Full screen image */}
               <img
                 src={item.image || "/placeholder.svg"}
                 alt="Fashion post"
-                className="w-full aspect-[4/5] object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-30"></div>
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
 
-            {/* Actions */}
-            <div className="flex items-center p-4">
-              <button 
-                className="mr-4 transform transition hover:scale-110"
-                onClick={() => handleLike(item.image)}
-              >
-                <ShoppingCart size={24} className="text-ghibli-night" />
-              </button>
-              <button className="mr-4 transform transition hover:scale-110">
-                <Heart size={24} className="text-ghibli-night" />
-              </button>
-              <button className="transform transition hover:scale-110">
-                <MessageCircle size={24} className="text-ghibli-night" />
-              </button>
-              <span className="ml-auto font-serif text-sm text-ghibli-night">{item.likes} likes</span>
-            </div>
+              {/* Overlay content */}
+              <div className="absolute inset-0 flex flex-col justify-between p-4">
+                {/* Header */}
+                <div className="flex items-center">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-ghibli-sky">
+                    <img
+                      src={item.avatar || "/placeholder.svg"}
+                      alt={item.username}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="ml-3 font-serif text-white">{item.username}</span>
+                </div>
 
-            {/* Caption */}
-            <div className="px-4 pb-4">
-              <p className="font-serif text-ghibli-night">
-                <span className="font-medium">{item.username}</span> {item.caption}
-              </p>
-              <p className="mt-1 text-sm text-ghibli-night opacity-60 font-serif">View all {item.comments} comments</p>
+                {/* Right side buttons */}
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-6">
+                  <button 
+                    className="transform transition hover:scale-110 flex flex-col items-center"
+                    onClick={() => handleLike(item.image)}
+                  >
+                    <ShoppingCart size={26} className="text-white mb-1" />
+                    <span className="text-white text-xs">Shop</span>
+                  </button>
+                  <button className="transform transition hover:scale-110 flex flex-col items-center">
+                    <Heart size={26} className="text-white mb-1" />
+                    <span className="text-white text-xs">{item.likes}</span>
+                  </button>
+                  <button className="transform transition hover:scale-110 flex flex-col items-center">
+                    <MessageCircle size={26} className="text-white mb-1" />
+                    <span className="text-white text-xs">{item.comments}</span>
+                  </button>
+                </div>
+
+                {/* Caption at bottom */}
+                <div className="max-w-[80%]">
+                  <p className="font-serif text-white">
+                    <span className="font-medium">{item.username}</span> {item.caption}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         ))
