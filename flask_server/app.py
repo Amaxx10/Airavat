@@ -39,9 +39,11 @@ def get_query():
         data = request.get_json()
         if not data or 'image_id' not in data:
             return {'error': 'No image ID provided'}, 400
-            
+        print(data)
         # Get image from MongoDB using the ID
-        image_doc = db['feedimages'].find_one({'_id': data['image_id']})
+        image_doc = db['feedimages'].find_one({'feed_id': data['image_id']})
+        # image_doc = db['feedimages'].find_one()
+        # print(image_doc)  # Uncommented to log the image document
         if not image_doc:
             return {'error': 'Image not found in database'}, 404
             

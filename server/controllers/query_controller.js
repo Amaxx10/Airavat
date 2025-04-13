@@ -25,9 +25,12 @@ export const get_query = async (req, res) => {
         const flaskUrl = process.env.FLASK_URL;
         console.log('Sending request to Flask server');
 
-        // Send image ID to Flask server instead of the image
+        // Send base64 image to Flask server
         const response = await axios.post(`${flaskUrl}/api/get_query`, 
-            { image_id: feedImage._id },
+            { 
+                image_id: feedImage.feed_id,  // Use feed_id instead of image_id
+                // image: base64Image // Send the actual image data
+            },
             {
                 headers: { 
                     'Content-Type': 'application/json'
