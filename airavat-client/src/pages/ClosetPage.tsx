@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Camera, Sun } from "lucide-react"
 import axios from "axios"
-import { ngrokURL } from "../config/backendURL"
+import { ngrokURL, backendURL } from "../config/backendURL"
 
 interface Weather {
   location: string
@@ -35,11 +35,32 @@ export function ClosetPage() {
     const fetchClosetItems = async () => {
       try {
         setIsLoading(true)
-        const response = await axios.get(`${ngrokURL}/closet/get_images`)
-        console.log('Closet response:', response)
+        const response = await fetch(`${backendURL}/closet/get_images`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error(`Expected JSON response but got ${contentType}`);
+        }
+
+        const data = await response.json();
+        console.log('Closet response data:', data);
         
+        if (!data.images || !Array.isArray(data.images)) {
+          throw new Error('Invalid response format: expected images array');
+        }
+
         // Transform the response data into our ClothingItem format
-        const transformedItems = response.data.images.map((image: string, index: number) => ({
+        const transformedItems = data.images.map((image: string, index: number) => ({
           id: `item-${index}`,
           image: image,
           description: `Clothing item ${index + 1}`
@@ -72,7 +93,7 @@ export function ClosetPage() {
         // Add the new item to the state
         const newItem = {
           id: response.data.dress.dress_id.toString(),
-          image: `data:image/jpeg;base64,${response.data.dress.image}`,
+          image: response.data.dress.image,
           description: response.data.dress.description
         }
 
@@ -125,7 +146,7 @@ export function ClosetPage() {
           <div className="animate-spin w-8 h-8 border-4 border-ghibli-forest border-t-transparent rounded-full"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {clothes.map((item) => (
             <div key={item.id} className="ghibli-card overflow-hidden hover:shadow-ghibli-lg transition-all">
               <div className="aspect-square">

@@ -13,7 +13,16 @@ const app = express();
 
 dotenv.config();
 app.use(express.json());
-app.use(cors());
+
+// Configure CORS
+const corsOptions = {
+  origin: ['https://d495-103-104-226-58.ngrok-free.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Accept'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(morgan('dev'));
 
 app.use('/query',query_routes);

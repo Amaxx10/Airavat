@@ -32,10 +32,12 @@ export const get_images = async (req, res) => {
   try {
     const dresses = await Closet.find();
     if (!dresses.length) {
-      return res.status(404).send('No images found');
+      return res.status(404).json({ message: 'No images found' });
     }
-    res.send({ images: dresses.map(dress => dress.image) });
+    res.setHeader('Content-Type', 'application/json');
+    res.json({ images: dresses.map(dress => dress.image) });
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    console.error('Error in get_images:', error);
+    res.status(500).json({ message: error.message });
   }
 };
