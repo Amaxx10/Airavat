@@ -8,6 +8,8 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
+from PIL import Image
+import io
 
 # Set up the environment variables for API keys
 app = Flask(__name__)
@@ -43,7 +45,6 @@ def get_query():
         # Get image from MongoDB using the ID
         image_doc = db['feedimages'].find_one({'feed_id': data['image_id']})
         # image_doc = db['feedimages'].find_one()
-        # print(image_doc)  # Uncommented to log the image document
         if not image_doc:
             return {'error': 'Image not found in database'}, 404
             
@@ -53,14 +54,16 @@ def get_query():
         # Decode base64 to bytes
         import base64
         image_bytes = base64.b64decode(image_data)
+
+        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
         
         # Process image data for Gemini
-        image_parts = [
-            {
-                "mime_type": "image/png",
-                "data": image_bytes
-            }
-        ]
+        # image_parts = [
+        #     {
+        #         "mime_type": "image/jpeg",
+        #         "data": image_file
+        #     }
+        # ]
         
         prompt = (
             "You are a fashion expert helping build a clothing search engine.\n"
@@ -73,7 +76,7 @@ def get_query():
             "Avoid full sentences. Just return a short, comma-separated search phrase like: 'black unisex jeans casual'."
         )
 
-        response = gemini_model.generate_content([prompt, image_parts])
+        response = gemini_model.generate_content([prompt, image])
         product_links = get_product_links(response.text.strip().replace("\n", ""))
         return {'query': response.text.strip().replace("\n", ""), 'product_links': product_links}
 
@@ -109,7 +112,6 @@ def get_product_links(query):
         link = item.get("product_link")
         if link:
             product_links.append(link)
-
     return product_links
 
 def extract_numbers(text):

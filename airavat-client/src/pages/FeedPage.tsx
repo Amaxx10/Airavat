@@ -80,14 +80,9 @@ export function FeedPage() {
         },
       })
       
-      console.log("Image uploaded:", res.data)
-      
-      // Get product links using the query
-      // const productResponse = await axios.post(`${ngrokURL}/query/get_query`, {
-      //   query: res.data.query
-      // })
-      
-      setProductLinks(res.data)
+      console.log(res.data.product_links)
+
+      setProductLinks(res.data.product_links)
       setShowPopup(true)
     } catch (error) {
       console.error("Error fetching product links:", error)
