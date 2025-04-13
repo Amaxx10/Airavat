@@ -5,10 +5,53 @@ import { MessageSquare, Send, X } from "lucide-react"
 import { Outlet } from "react-router-dom"
 import { Navigation } from "./components/Navigation"
 import { GhibliDecoration } from "./components/GhibliIllustrations"
+import { flaskURL } from "./config/backendURL"
 
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [message, setMessage] = useState("")
+  const [messages, setMessages] = useState<{text: string, isUser: boolean}[]>([]);
+  const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  const sendMessage = async (message: string) => {
+    try {
+      setMessages(prev => [...prev, {text: message, isUser: true}]);
+      setIsTyping(true);
+      setInput('');
+
+      const response = await fetch(`${flaskURL}/api/chat`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+          message
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Unknown error occurred');
+      }
+
+      setMessages(prev => [...prev, 
+        {text: data.response, isUser: false}
+      ]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages(prev => [...prev,
+        {text: 'Sorry, I encountered an error. Please try again!', isUser: false}
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen w-full font-sans relative overflow-hidden">
@@ -53,29 +96,43 @@ export default function App() {
                 <X size={20} />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 bg-ghibli-cloud bg-opacity-30">
-              {/* Chat messages */}
-              <div className="mb-4 max-w-xs ml-auto bg-ghibli-forest text-white rounded-2xl p-3 shadow-sm">
-                <p className="font-serif">Hello! I'm your Fashion Spirit. How can I help you find your style today?</p>
-              </div>
-
-              <div className="mb-4 max-w-xs bg-white bg-opacity-70 rounded-2xl p-3 shadow-sm">
-                <p className="font-serif">
-                  I can suggest outfits, help you organize your closet, or give you style advice for any occasion.
-                </p>
-              </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[75%] p-3 rounded-lg mb-2 ${
+                    msg.isUser ? 'bg-ghibli-sky text-white' : 'bg-gray-100'
+                  }`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-100 p-3 rounded-lg mb-2">
+                    <div className="flex gap-2">
+                      <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="p-4 border-t border-ghibli-sky border-opacity-30 flex gap-2">
-              <input
-                type="text"
-                placeholder="Ask about your style..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="flex-1 ghibli-input font-serif"
-              />
-              <button className="bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white rounded-full p-2 shadow-sm hover:shadow-md transition-shadow">
-                <Send size={20} />
-              </button>
+            <div className="p-4 border-t">
+              <form onSubmit={e => {
+                e.preventDefault();
+                if (input.trim()) {
+                  sendMessage(input);
+                  setInput('');
+                }
+              }}>
+                <input
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  className="w-full p-2 rounded border"
+                  placeholder="Ask your fashion spirit..."
+                />
+              </form>
             </div>
           </div>
         </div>

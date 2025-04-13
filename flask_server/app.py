@@ -10,6 +10,7 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 from PIL import Image
 import io
+import datetime
 
 # Set up the environment variables for API keys
 app = Flask(__name__)
@@ -22,6 +23,7 @@ try:
     db = mongo_client['test']
     closet_collection = db['closets']  # Add collection for closet
     feed_images_collection = db['feedimages']
+    userpreferences_collection = db['preferences']
     print(closet_collection.count_documents({}))
     print("MongoDB connected successfully!")
 except ConnectionFailure as e:
@@ -187,6 +189,51 @@ def get_ai_styling():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Add chatbot instance
+from .chatbot import analyze_input, init_chat
+
+# Initialize chatbot instance with no initial preferences
+chat_instance = init_chat()
+
+@app.route('/api/chat', methods=['POST'])
+def chat_endpoint():
+    try:
+        if not request.is_json:
+            return jsonify({'success': False, 'error': 'Content-Type must be application/json'}), 415
+            
+        data = request.get_json()
+        if not data or 'message' not in data:
+            return jsonify({'success': False, 'error': 'Message is required'}), 400
+            
+        message = data.get('message')
+        
+        # Get preferences from MongoDB using the schema structure
+        preferences = userpreferences_collection.find_one({}, {'_id': 0})
+        if not preferences:
+            preferences = {
+                'gender': None,
+                'skinTone': None,
+                'bodyShape': None,
+                'stylePreferences': [],
+                'colorPreferences': []
+            }
+            
+        # Pass structured preferences to analyze_input
+        response = analyze_input(chat_instance, message, preferences=preferences)
+        
+        return jsonify({
+            'success': True,
+            'response': response,
+            'timestamp': datetime.datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        print(f"Chat error: {str(e)}")  # Server-side logging
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
