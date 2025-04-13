@@ -2,16 +2,26 @@ import google.generativeai as genai
 import PIL.Image
 import json
 import os
+from pymongo import MongoClient
+import io
+import base64
+from dotenv import load_dotenv
 
-# Authenticate Gemini
-genai.configure(api_key="AIzaSyC1f61j-VZUjkqNJZdhumpoON2ZZZjTcjY")
+# Load environment variables
+load_dotenv()
 
-# === CONFIG ===
-image_path = "data/lowers/download.jpg"  # Folder containing the images
-item_type = "lower"  # or "lower"
-output_json = "clothing_items.json"
+# Configure Gemini
+genai.configure(api_key='AIzaSyBaYFDALGVb0wwpZX8hQSF2I-VUeSgmRSs')
 
-# Load all images in the folder
+# Connect to MongoDB
+try:
+    mongo_client = MongoClient('mongodb+srv://amankanojia22:amanmongo@cluster0.fx2kc.mongodb.net/')
+    db = mongo_client["test"]
+    closet_collection = db["closets"]
+    print("MongoDB connected successfully!")
+except Exception as e:
+    print(f"MongoDB connection error: {e}")
+    exit(1)
 
 # Define Gemini prompt
 prompt = """
@@ -20,47 +30,66 @@ Mention: type (e.g., hoodie, shirt), material, color, fit (e.g., loose, slim), a
 I don't want any extra text explaining what you are doing. Directly start the description.
 """
 
-# Initialize list to hold clothing entries
-clothing_items = []
-last_id = 4
+def process_image(image_data):
+    try:
+        # Remove the "data:image/jpeg;base64," prefix if it exists
+        if image_data.startswith("data:image"):
+            image_data = image_data.split(",")[1]
+        
+        # Decode base64 to bytes
+        image_bytes = base64.b64decode(image_data)
+        
+        # Save temporary image file
+        temp_image_path = "./temp/temp_image.jpg"
+        os.makedirs(os.path.dirname(temp_image_path), exist_ok=True)  # Ensure temp directory exists
+        with open(temp_image_path, "wb") as temp_file:
+            temp_file.write(image_bytes)
+        
+        # Load image using PIL
+        image = PIL.Image.open(temp_image_path).convert("RGB")
+        
+        # Call Gemini API
+        model = genai.GenerativeModel('gemini-1.5-pro-latest')
+        response = model.generate_content([prompt, image])
+        
+        # Clean up temporary file
+        os.remove(temp_image_path)
+        
+        return response.text.strip()
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        if os.path.exists(temp_image_path):
+            os.remove(temp_image_path)
+        return None
 
+def update_closet_descriptions():
+    # Get all items from closet
+    closet_items = closet_collection.find({})
+    
+    for item in closet_items:
+        try:
+            # Get image data
+            if 'image' not in item:
+                print(f"No image found for item {item.get('_id')}")
+                continue
+                
+            print(f"Processing item {item.get('_id')}...")
+            
+            # Generate description
+            new_description = process_image(item['image'])
+            
+            if new_description:
+                # Update the document with new description
+                closet_collection.update_one(
+                    {"_id": item["_id"]},
+                    {"$set": {"description": new_description}}
+                )
+                print(f"Updated description for item {item.get('_id')}")
+            
+        except Exception as e:
+            print(f"Error processing item {item.get('_id')}: {e}")
 
-# Process each image
-
-# Load the image
-img = PIL.Image.open(image_path)
-
-# Call Gemini API
-model = genai.GenerativeModel('gemini-2.0-flash')
-response = model.generate_content([prompt, img])
-description = response.text.strip()
-
-# Create the structured entry
-clothing_entry = {
-    "id": len(clothing_items) + last_id + 1,  # Unique ID based on the current number of entries
-    "path": image_path,
-    "type": item_type,
-    "description": description
-}
-
-# Append new item to the list
-clothing_items.append(clothing_entry)
-
-# === Save to JSON ===
-
-# Check if file exists
-if os.path.exists(output_json):
-    with open(output_json, "r") as f:
-        existing_items = json.load(f)
-else:
-    existing_items = []
-
-# Merge the new items with existing ones
-existing_items.extend(clothing_items)
-
-# Save updated JSON
-with open(output_json, "w") as f:
-    json.dump(existing_items, f, indent=4)
-
-print(f"✅ Descriptions saved to {output_json}")
-print("📄 Entries:", clothing_items)
+if __name__ == "__main__":
+    print("Starting closet description update process...")
+    update_closet_descriptions()
+    print("Process completed!")

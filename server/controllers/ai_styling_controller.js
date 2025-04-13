@@ -19,6 +19,7 @@ export const get_aiStyling = async (req, res) => {
 
     // Get AI styling suggestion from Flask
     const response = await axios.post(`${flaskUrl}/api/ai-styling`, {
+      user_preferences: userPreferences,
       headers: {
         'Content-Type': 'application/json'
       }
