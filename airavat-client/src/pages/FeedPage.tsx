@@ -56,6 +56,7 @@ export function FeedPage() {
   const handleLike = async (imageUrl: string) => {
     try {
       setIsLoading(true)
+      setShowPopup(true)
       
       // Fetch the image and convert it to a File object
       const response = await fetch(imageUrl)
@@ -80,12 +81,20 @@ export function FeedPage() {
         },
       })
       
-      console.log(res.data.product_links)
-
-      setProductLinks(res.data.product_links)
-      setShowPopup(true)
+      console.log("Image uploaded:", res.data)
+      
+      // Transform the product links into the required format
+      const transformedLinks = res.data.product_links.map((link: string, index: number) => ({
+        title: `Product ${index + 1}`,
+        link,
+        thumbnail: "/placeholder.svg"
+      }))
+      
+      
+      setProductLinks(transformedLinks)
     } catch (error) {
       console.error("Error fetching product links:", error)
+      setProductLinks([])
     } finally {
       setIsLoading(false)
     }
@@ -185,8 +194,8 @@ export function FeedPage() {
                     >
                       <img 
                         src={product.thumbnail} 
-                        alt={product.title}
-                        className="w-full h-48 object-cover rounded-lg mb-3"
+                        alt=""
+                        className="w-full h-18 object-cover rounded-lg mb-3"
                       />
                       <h4 className="font-serif text-ghibli-night line-clamp-2">{product.title}</h4>
                     </a>

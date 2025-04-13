@@ -2,6 +2,7 @@ import { Calendar, Sparkles } from "lucide-react"
 import axios from "axios";
 import { backendURL } from "../config/backendURL";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export function AIStylingPage() {
   const [outfitData, setOutfitData] = useState(null);
@@ -45,11 +46,12 @@ export function AIStylingPage() {
         <p className="text-ghibli-night opacity-80 font-serif mb-4">
           Connect your calendar to receive outfit suggestions for your upcoming events and seasonal changes.
         </p>
-
-        <button className="w-full ghibli-card py-3 flex items-center justify-center gap-2 font-serif text-ghibli-night">
-          <Calendar size={18} />
-          <span>Connect Calendar</span>
-        </button>
+        <Link to="/calendar">
+  <button className="w-full ghibli-card py-3 flex items-center justify-center gap-2 font-serif text-ghibli-night">
+    <Calendar size={18} />
+    <span>Connect Calendar</span>
+  </button>
+</Link>
       </div>
 
       <div className="ghibli-card p-6 relative overflow-hidden">

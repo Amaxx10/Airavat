@@ -10,6 +10,7 @@ import { ProfilePage } from './pages/ProfilePage'
 import { PreferencesPage } from './pages/PreferencesPage'
 import App from './App'
 import { useEffect } from 'react'
+import { CalendarEventsPage } from './pages/CalendarEventsPage'
 
 const tmp = 'h-screen bg-black text-white text-4xl text-center grid place-items-center'
 
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: '/preferences',
         element: <PreferencesPage />,
+      },
+      {
+        path: '/calendar',
+        element: <CalendarEventsPage />,
       }
     ]
   }
