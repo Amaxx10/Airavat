@@ -11,6 +11,7 @@ from pymongo.errors import ConnectionFailure
 from PIL import Image
 import io
 import datetime
+from .tryon_utils import process_virtual_tryon
 
 # Set up the environment variables for API keys
 app = Flask(__name__)
@@ -234,6 +235,26 @@ def chat_endpoint():
             'success': False,
             'error': str(e)
         }), 500
+
+@app.route('/api/virtual-tryon', methods=['POST'])
+def virtual_tryon():
+    try:
+        if 'person_image' not in request.files or 'cloth_image' not in request.files:
+            return jsonify({'error': 'Both person and cloth images are required'}), 400
+            
+        person_image = request.files['person_image'].read()
+        cloth_image = request.files['cloth_image'].read()
+        
+        result_image = process_virtual_tryon(person_image, cloth_image)
+        
+        return jsonify({
+            'success': True,
+            'result': base64.b64encode(result_image).decode('utf-8')
+        })
+        
+    except Exception as e:
+        print(f"Virtual try-on error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
