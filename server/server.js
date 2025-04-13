@@ -12,15 +12,7 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 dotenv.config();
-// app.use(express.json());
-//
-// // Configure CORS
-// const corsOptions = {
-//   origin: ['https://d495-103-104-226-58.ngrok-free.app', 'http://localhost:3000'],
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Accept'],
-//   credentials: true
-// };
+app.use(express.json());
 
 app.use(cors());
 app.use(morgan("dev"));

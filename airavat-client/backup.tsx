@@ -1,3 +1,4 @@
+
 import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
@@ -20,10 +21,6 @@ export function TryOnPage() {
   const [clothImage, setClothImage] = useState<File | null>(null)
   const [resultImage, setResultImage] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-
-  // Add new state for mockup feature
-  const [isMockupProcessing, setIsMockupProcessing] = useState(false)
-  const [mockupResultImage, setMockupResultImage] = useState<string | null>(null)
 
   useEffect(() => {
     return () => {
@@ -112,29 +109,6 @@ export function TryOnPage() {
     }
   }
 
-  const handleTryOn2 = async () => {
-    if (!personImage || !clothImage) {
-      console.error("Both images are required")
-      return
-    }
-
-    setIsMockupProcessing(true)
-    
-    try {
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 10000))
-      
-      // Use a static result image from public folder
-      // Make sure to add a sample result image named 'mockup-result.jpg' in your public folder
-      setMockupResultImage('/mockup-result.jpg')
-      
-    } catch (error) {
-      console.error('Mockup try-on failed:', error)
-    } finally {
-      setIsMockupProcessing(false)
-    }
-  }
-
   const handleUpload = async () => {
     if (!selectedFile) {
       console.error("No file selected to upload.")
@@ -210,7 +184,7 @@ export function TryOnPage() {
           </div>
         )}
       </div>
-{/* 
+
       <div className="grid grid-cols-2 gap-4 w-full">
         <div className="ghibli-card p-4">
           <h3 className="font-serif mb-2">Your Photo</h3>
@@ -272,68 +246,6 @@ export function TryOnPage() {
           <Sparkles size={18} className="text-ghibli-forest" />
           <span className="text-ghibli-night">Go to Spirit Styling</span>
         </button>
-      )} */}
-
-      {/* Add new mockup section after the original try-on section */}
-      <div className="w-full border-t border-ghibli-cloud my-8"></div>
-      
-      <div className="text-center mb-2">
-        <h2 className="text-2xl font-serif font-medium ghibli-gradient-text mb-2"> Try-On</h2>
-        <p className="text-ghibli-night opacity-70 font-serif">Test your looks in your closet</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 w-full">
-        <div className="ghibli-card p-4 flex flex-col items-center">
-          <h3 className="font-serif mb-4 text-center">Your Photo</h3>
-          <label className="cursor-pointer bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white px-6 py-2 rounded-lg inline-block hover:shadow-ghibli transition-all mb-4">
-            <span>Select Photo</span>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handlePersonImageSelect} 
-              className="hidden"
-            />
-          </label>
-          {personImage && <img src={URL.createObjectURL(personImage)} alt="Person" className="w-full h-auto rounded-lg" />}
-        </div>
-        
-        <div className="ghibli-card p-4 flex flex-col items-center">
-          <h3 className="font-serif mb-4 text-center">Clothing Item</h3>
-          <label className="cursor-pointer bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white px-6 py-2 rounded-lg inline-block hover:shadow-ghibli transition-all mb-4">
-            <span>Select Clothing</span>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleClothImageSelect} 
-              className="hidden"
-            />
-          </label>
-          {clothImage && <img src={URL.createObjectURL(clothImage)} alt="Cloth" className="w-full h-auto rounded-lg" />}
-        </div>
-      </div>
-
-      {personImage && clothImage && (
-        <button
-          onClick={handleTryOn2}
-          disabled={isMockupProcessing}
-          className="w-full bg-gradient-to-r from-ghibli-meadow to-ghibli-forest text-white rounded-xl py-3 font-serif"
-        >
-          {isMockupProcessing ? (
-            <div className="flex items-center justify-center gap-2">
-              <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
-              <span>Enchanting Your Look...</span>
-            </div>
-          ) : (
-            'Transform Your Look ✨'
-          )}
-        </button>
-      )}
-
-      {mockupResultImage && (
-        <div className="ghibli-card p-4 w-full">
-          <h3 className="font-serif mb-2 text-center">Your new Look ✨</h3>
-          <img src={mockupResultImage} alt=" try-on result" className="w-full h-auto rounded-lg shadow-ghibli" />
-        </div>
       )}
 
       {/* <div className="w-full mt-4">

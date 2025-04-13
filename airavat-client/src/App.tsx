@@ -77,10 +77,10 @@ export default function App() {
       {/* Floating AI Chat Button */}
       <button
         onClick={() => setIsChatOpen(true)}
-        className="fixed bottom-20 right-4 bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white rounded-full p-3 shadow-ghibli flex items-center gap-2 transform transition-all duration-300 hover:shadow-ghibli-lg hover:-translate-y-1 z-10"
+        className="fixed bottom-24 right-4 bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white rounded-full p-5 shadow-ghibli flex items-center gap-0 transform transition-all duration-300 hover:shadow-ghibli-lg hover:-translate-y-1 z-10"
       >
-        <MessageSquare size={18} />
-        <span className="font-serif">Fashion Spirit</span>
+        <MessageSquare size={25} />
+        <span className="font-serif"></span>
       </button>
 
       {/* AI Chatbot Modal */}

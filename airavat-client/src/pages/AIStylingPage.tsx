@@ -11,7 +11,7 @@ export function AIStylingPage() {
   const handleSummonOutfit = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${backendURL}/ai/ai_styling`, {
+      const response = await axios.post(`${backendURL}/ai/ai_styling`, {
         headers: {
           'Content-Type': 'application/json'
         }

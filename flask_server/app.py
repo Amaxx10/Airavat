@@ -11,7 +11,7 @@ from pymongo.errors import ConnectionFailure
 from PIL import Image
 import io
 import datetime
-from .tryon_utils import process_virtual_tryon
+from tryon_utils import process_virtual_tryon
 import base64
 
 # Set up the environment variables for API keys
