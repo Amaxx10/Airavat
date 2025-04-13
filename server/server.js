@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Configure CORS
 const corsOptions = {
-  origin: ['https://d495-103-104-226-58.ngrok-free.app', 'http://localhost:3000'],
+  origin: [process.env.ngrokURL, 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Accept'],
   credentials: true

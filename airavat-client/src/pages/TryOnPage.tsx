@@ -88,16 +88,18 @@ export function TryOnPage() {
     const formData = new FormData()
     formData.append('person_image', personImage)
     formData.append('cloth_image', clothImage)
-
+    console.log(ngrokURL)
     try {
-      const response = await fetch(`${flaskURL}/api/virtual-tryon`, {
-        method: 'POST',
-        body: formData
+      const response = await fetch(`${ngrokURL}/api/virtual_tryon`, {
+        method: 'POST',  // Changed from GET to POST to match Flask endpoint
+        body: formData,  // Added body to send form data
       })
       
       const data = await response.json()
       if (data.success) {
         setResultImage(`data:image/jpeg;base64,${data.result}`)
+      } else {
+        console.error('Virtual try-on failed:', data.error);
       }
     } catch (error) {
       console.error('Virtual try-on failed:', error)

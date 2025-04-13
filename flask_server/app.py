@@ -12,6 +12,7 @@ from PIL import Image
 import io
 import datetime
 from .tryon_utils import process_virtual_tryon
+import base64
 
 # Set up the environment variables for API keys
 app = Flask(__name__)
@@ -239,11 +240,9 @@ def chat_endpoint():
 @app.route('/api/virtual-tryon', methods=['POST'])
 def virtual_tryon():
     try:
-        if 'person_image' not in request.files or 'cloth_image' not in request.files:
-            return jsonify({'error': 'Both person and cloth images are required'}), 400
-            
-        person_image = request.files['person_image'].read()
-        cloth_image = request.files['cloth_image'].read()
+        # Use local file paths instead of file uploads
+        person_image = r"flask_server\images\human.jpg"  # Local path to person image
+        cloth_image = r"flask_server\images\cloth.jpeg"  # Local path to cloth image
         
         result_image = process_virtual_tryon(person_image, cloth_image)
         

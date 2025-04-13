@@ -65,3 +65,20 @@ export const get_aiStyling = async (req, res) => {
     });
   }
 };
+
+export const virtual_tryon = async (req, res) => {
+    try {
+        const response = await axios.post(`${flaskUrl}/api/virtual-tryon`, {}, {  // Changed to POST
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        console.error('Virtual try-on error:', error);
+        res.status(500).json({ 
+            success: false,
+            error: error.message 
+        });
+    }
+};
