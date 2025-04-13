@@ -285,8 +285,8 @@ export function TryOnPage() {
       <div className="grid grid-cols-2 gap-4 w-full">
         <div className="ghibli-card p-4 flex flex-col items-center">
           <h3 className="font-serif mb-4 text-center">Your Photo</h3>
-          <label className="cursor-pointer bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white px-6 py-2 rounded-lg inline-block hover:shadow-ghibli transition-all mb-4">
-            <span>Select Photo</span>
+          <label className="cursor-pointer bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white px-6 py-2 rounded-3xl inline-block hover:shadow-ghibli transition-all mb-4">
+            <span>Select</span>
             <input 
               type="file" 
               accept="image/*" 
@@ -299,8 +299,8 @@ export function TryOnPage() {
         
         <div className="ghibli-card p-4 flex flex-col items-center">
           <h3 className="font-serif mb-4 text-center">Clothing Item</h3>
-          <label className="cursor-pointer bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white px-6 py-2 rounded-lg inline-block hover:shadow-ghibli transition-all mb-4">
-            <span>Select Clothing</span>
+          <label className="cursor-pointer bg-gradient-to-r from-ghibli-forest to-ghibli-sky text-white px-6 py-2 rounded-3xl inline-block hover:shadow-ghibli transition-all mb-4">
+            <span>Select</span>
             <input 
               type="file" 
               accept="image/*" 
