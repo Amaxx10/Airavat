@@ -28,13 +28,13 @@ export const uploadImage = async (req, res) => {
   }
 };
 
-export const getImage = async (req, res) => {
+export const get_images = async (req, res) => {
   try {
-    const dress = await Closet.findOne({ dress_id: req.params.dress_id });
-    if (!dress) {
-      return res.status(404).send('Image not found');
+    const dresses = await Closet.find();
+    if (!dresses.length) {
+      return res.status(404).send('No images found');
     }
-    res.send({ image: dress.image });
+    res.send({ images: dresses.map(dress => dress.image) });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
