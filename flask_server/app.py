@@ -11,7 +11,7 @@ from pymongo.errors import ConnectionFailure
 from PIL import Image
 import io
 import datetime
-from tryon_utils import process_virtual_tryon
+from .tryon_utils import process_virtual_tryon
 import base64
 
 # Set up the environment variables for API keys
@@ -155,8 +155,8 @@ def get_clothing_suggestion(
     
     Lower garments:
     {"\n".join([f"{item['dress_id']}. {item['description']}" for item in lower_items])}
-    """
-
+    """ 
+    print(f"Prompt for AI: {prompt}")
     response = gemini_model.generate_content(prompt)
     return response.text.strip()
 
@@ -166,9 +166,9 @@ def get_ai_styling():
     try:
         if not request.is_json:
             return jsonify({"error": "Content-Type must be application/json"}), 415
-
         data = request.get_json()
-        preferences = data.get("preferences", None)
+        print(data)
+        preferences = data.get("user_preferences", None)
         weather = data.get("weather", "Sunny, 31 degrees")
         occasion = data.get("occasion", "casual")
 
@@ -210,7 +210,7 @@ def get_ai_styling():
 
 
 # Add chatbot instance
-from chatbot import analyze_input, init_chat
+from .chatbot import analyze_input, init_chat
 
 # Initialize chatbot instance with no initial preferences
 chat_instance = init_chat()

@@ -112,28 +112,28 @@ export function TryOnPage() {
     }
   }
 
-  const handleTryOn2 = async () => {
-    if (!personImage || !clothImage) {
-      console.error("Both images are required")
-      return
-    }
+  // const handleTryOn2 = async () => {
+  //   if (!personImage || !clothImage) {
+  //     console.error("Both images are required")
+  //     return
+  //   }
 
-    setIsMockupProcessing(true)
+  //   setIsMockupProcessing(true)
     
-    try {
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 10000))
+  //   try {
+  //     // Simulate processing delay
+  //     await new Promise(resolve => setTimeout(resolve, 10000))
       
-      // Use a static result image from public folder
-      // Make sure to add a sample result image named 'mockup-result.jpg' in your public folder
-      setMockupResultImage('/mockup-result.jpg')
+  //     // Use a static result image from public folder
+  //     // Make sure to add a sample result image named 'mockup-result.jpg' in your public folder
+  //     setMockupResultImage('/mockup-result.jpg')
       
-    } catch (error) {
-      console.error('Mockup try-on failed:', error)
-    } finally {
-      setIsMockupProcessing(false)
-    }
-  }
+  //   } catch (error) {
+  //     console.error('Mockup try-on failed:', error)
+  //   } finally {
+  //     setIsMockupProcessing(false)
+  //   }
+  // }
 
   const handleUpload = async () => {
     if (!selectedFile) {
@@ -314,7 +314,7 @@ export function TryOnPage() {
 
       {personImage && clothImage && (
         <button
-          onClick={handleTryOn2}
+          onClick={handleTryOn}
           disabled={isMockupProcessing}
           className="w-full bg-gradient-to-r from-ghibli-meadow to-ghibli-forest text-white rounded-xl py-3 font-serif"
         >
