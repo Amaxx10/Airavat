@@ -29,16 +29,19 @@ def init_chat(preferences=None):
     ])
     return chat
 
-def analyze_input(chat_instance, user_input, preferences=None, is_image=False):
+def analyze_input(chat_instance, user_input, preferences=None, is_image=False, descriptions=None):
     try:
         # Add preferences context if available
-        if preferences:
+        if preferences or descriptions:
             context = f"Consider these style preferences while responding:\n"
             context += f"- Colors: {', '.join(preferences.get('favorite_colors', []))}\n"
             context += f"- Styles: {', '.join(preferences.get('style_preferences', []))}\n"
             context += f"- Occasions: {', '.join(preferences.get('preferred_occasions', []))}\n"
+            context += f"Consider these descriptions while responding:\n"
+            context += f"- Descriptions: {', '.join([desc['description'] for desc in descriptions])}\n"
             user_input = f"{context}\nUser message: {user_input}"
 
+        print(user_input)
         if is_image:
             if isinstance(user_input, str):
                 image = Image.open(user_input)

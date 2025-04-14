@@ -21,7 +21,15 @@ def setup_chrome_driver():
     chrome_driver_path = r"E:\chromedriver-win64\chromedriver-win64\chromedriver.exe"
     return webdriver.Chrome(service=Service(chrome_driver_path), options=chrome_options)
 
-def process_virtual_tryon(person_image_path, cloth_image_path):
+def process_virtual_tryon(person_image, cloth_image):
+    # Save the uploaded images to temporary files
+    person_image_path = "temp_person_image.jpg"
+    cloth_image_path = "temp_cloth_image.jpg"
+    with open(person_image_path, "wb") as f:
+        f.write(person_image.read())
+    with open(cloth_image_path, "wb") as f:
+        f.write(cloth_image.read())
+
     driver = setup_chrome_driver()
     download_folder = r"images"  # Output folder for results
     os.makedirs(download_folder, exist_ok=True)
@@ -213,7 +221,7 @@ def process_virtual_tryon(person_image_path, cloth_image_path):
                 src = img.get_attribute("src")
                 if src and src.startswith('data:image'):
                     img_data = src.split(",")[1]
-                    return base64.b64decode(img_data)
+                    return base64.b64decode(img_data)  # Return image as bytes
             except:
                 continue
                 

@@ -26,6 +26,7 @@ try:
     closet_collection = db["closets"]  # Add collection for closet
     feed_images_collection = db["feedimages"]
     userpreferences_collection = db["preferences"]
+    generated_collection = db["generated"]  # Add collection for generated images
     print(closet_collection.count_documents({}))
     print("MongoDB connected successfully!")
 except ConnectionFailure as e:
@@ -233,6 +234,13 @@ def chat_endpoint():
 
         message = data.get("message")
 
+        # Fetch descriptions and dress IDs from MongoDB
+        descriptions_get = closet_collection.find({}, {"description": 1, "dress_id": 1, "_id": 0})
+        descriptions = [
+            {"description": item["description"], "dress_id": item["dress_id"]}
+            for item in descriptions_get
+        ]
+
         # Get preferences from MongoDB using the schema structure
         preferences = userpreferences_collection.find_one({}, {"_id": 0})
         if not preferences:
@@ -244,8 +252,8 @@ def chat_endpoint():
                 "colorPreferences": [],
             }
 
-        # Pass structured preferences to analyze_input
-        response = analyze_input(chat_instance, message, preferences=preferences)
+        # Pass structured preferences and descriptions to analyze_input
+        response = analyze_input(chat_instance, message, preferences=preferences, descriptions=descriptions)
 
         return jsonify(
             {
@@ -260,22 +268,29 @@ def chat_endpoint():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
-
-
 @app.route("/api/virtual-tryon", methods=["POST"])
 def virtual_tryon():
     try:
-        # Use local file paths instead of file uploads
-        person_image = r"flask_server\images\human.jpg"  # Local path to person image
-        cloth_image = r"flask_server\images\cloth.jpeg"  # Local path to cloth image
+        if "person_image" not in request.files or "cloth_image" not in request.files:
+            return jsonify({"error": "Missing required images"}), 400
 
+        person_image = request.files["person_image"]
+        cloth_image = request.files["cloth_image"]
+
+        # Process virtual try-on
         result_image = process_virtual_tryon(person_image, cloth_image)
 
-        return jsonify(
-            {"success": True, "result": base64.b64encode(result_image).decode("utf-8")}
-        )
+        # Store the generated image in MongoDB
+        generated_collection.delete_many({})  # Ensure only one unique entry exists
+        generated_collection.insert_one({"image": base64.b64encode(result_image).decode("utf-8")})
+
+        # Fetch the stored image
+        stored_image = generated_collection.find_one({}, {"_id": 0, "image": 1})
+        if not stored_image:
+            return jsonify({"error": "Failed to retrieve generated image"}), 500
+
+        # Send the image in base64 format
+        return jsonify({"success": True, "result": stored_image["image"]})
 
     except Exception as e:
         print(f"Virtual try-on error: {str(e)}")

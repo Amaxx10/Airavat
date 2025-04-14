@@ -2,6 +2,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import {Closet} from '../models/closet.js';
 import {UserPreferences} from '../models/user_preferences.js';
+import FormData from 'form-data';
 dotenv.config();
 
 const flaskUrl = process.env.FLASK_URL;
@@ -69,17 +70,24 @@ export const get_aiStyling = async (req, res) => {
 
 export const virtual_tryon = async (req, res) => {
     try {
-        const response = await axios.post(`${flaskUrl}/api/virtual-tryon`, {}, {  // Changed to POST
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        if (!req.files || !req.files.person_image || !req.files.cloth_image) {
+            return res.status(400).json({ success: false, error: "Missing required images" });
+        }
+
+        const formData = new FormData();
+        formData.append("person_image", req.files.person_image.data, req.files.person_image.name);
+        formData.append("cloth_image", req.files.cloth_image.data, req.files.cloth_image.name);
+
+        const response = await axios.post(`${flaskUrl}/api/virtual-tryon`, formData, {
+            headers: formData.getHeaders(),
         });
+
         res.status(response.status).json(response.data);
     } catch (error) {
         console.error('Virtual try-on error:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             success: false,
-            error: error.message 
+            error: error.message,
         });
     }
 };
